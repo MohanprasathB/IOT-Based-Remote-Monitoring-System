@@ -1,0 +1,5 @@
+../Core/Src/Master_Modbus.c:17:6:ModbusMaster_Init	2
+../Core/Src/Master_Modbus.c:43:16:ModbusMaster_CalculateCRC	4
+../Core/Src/Master_Modbus.c:61:6:ModbusMaster_SendRequest	2
+../Core/Src/Master_Modbus.c:92:16:ModbusMaster_ReceiveResponse	4
+../Core/Src/Master_Modbus.c:122:6:ModbusMaster_ReadInputRegisters	1
