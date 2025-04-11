@@ -11,8 +11,8 @@
 #define MODBUS_FC_READ_INPUT_REGISTERS     0x04  // Read Input Registers
 
 /* RS-485 Line Selection */
-#define RS485_TX_ENABLE()                  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET)
-#define RS485_RX_ENABLE()                  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET)
+#define RS485_TX_ENABLE()                  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_4, GPIO_PIN_SET)
+#define RS485_RX_ENABLE()                  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_4, GPIO_PIN_RESET)
 
 /* Master-Specific Variables */
 extern unsigned char ModbusMaster_inbox[MODBUS_MASTER_INBOX_LENGTH];
@@ -64,5 +64,5 @@ unsigned short ModbusMaster_ReceiveResponse(unsigned char *buffer, unsigned shor
 
 /* Read Input Registers Function */
 void ModbusMaster_ReadInputRegisters(unsigned char slave_id, unsigned short start_address, unsigned short data_length);
-
+extern unsigned char ModbusMaster_inbox[MODBUS_MASTER_INBOX_LENGTH];
 #endif /* INC_MODBUSMASTER_H_ */

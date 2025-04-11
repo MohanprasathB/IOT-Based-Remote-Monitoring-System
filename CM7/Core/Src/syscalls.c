@@ -79,17 +79,17 @@ __attribute__((weak)) int _read(int file, char *ptr, int len)
 
 __attribute__((weak)) int _write(int file, char *ptr, int len)
 {
-//  (void)file;
-//  int DataIdx;
-//
-//  for (DataIdx = 0; DataIdx < len; DataIdx++)
-//  {
-//    __io_putchar(*ptr++);
-//  }
-	extern UART_HandleTypeDef huart3;
-	if(file == 1){
-		HAL_UART_Transmit(&huart3,ptr,len,1000);
-	}
+  (void)file;
+  int DataIdx;
+
+  for (DataIdx = 0; DataIdx < len; DataIdx++)
+  {
+    __io_putchar(*ptr++);
+  }
+//	extern UART_HandleTypeDef huart3;
+//	if(file == 1){
+//		HAL_UART_Transmit(&huart3,ptr,len,1000);
+//	}
   return len;
 }
 

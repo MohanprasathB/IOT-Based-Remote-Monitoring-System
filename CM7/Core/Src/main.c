@@ -25,6 +25,8 @@
 /* USER CODE BEGIN Includes */
 #include "stdio.h"
 #include "Master_Modbus.h"
+#include "mongoose_glue.h"
+#include "mongoose.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -43,7 +45,7 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+#define scaling_factor 0.01f
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -68,7 +70,9 @@ ETH_TxPacketConfig TxConfig;
 
 ETH_HandleTypeDef heth;
 
-UART_HandleTypeDef huart1;
+RNG_HandleTypeDef hrng;
+
+UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
 
 /* Definitions for defaultTask */
@@ -82,7 +86,7 @@ const osThreadAttr_t defaultTask_attributes = {
 osThreadId_t myTask02Handle;
 const osThreadAttr_t myTask02_attributes = {
   .name = "myTask02",
-  .stack_size = 128 * 4,
+  .stack_size = 2000 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
 /* USER CODE BEGIN PV */
@@ -94,7 +98,8 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_ETH_Init(void);
 static void MX_USART3_UART_Init(void);
-static void MX_USART1_UART_Init(void);
+static void MX_USART2_UART_Init(void);
+static void MX_RNG_Init(void);
 void StartDefaultTask(void *argument);
 void StartTask02(void *argument);
 
@@ -104,7 +109,25 @@ void StartTask02(void *argument);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+bool mg_random(void *buf, size_t len) {  // Use on-board RNG
+  for (size_t n = 0; n < len; n += sizeof(uint32_t)) {
+    uint32_t r;
+    HAL_RNG_GenerateRandomNumber(&hrng, &r);
+    memcpy((char *) buf + n, &r, n + sizeof(r) > len ? len - n : sizeof(r));
+  }
+  return true; // TODO(): ensure successful RNG init, then return on false above
+}
 
+uint64_t mg_millis(void) {
+  return HAL_GetTick();
+}
+
+int _write(int fd, unsigned char *buf, int len) {
+  if (fd == 1 || fd == 2) {                     // stdout or stderr ?
+    HAL_UART_Transmit(&huart3, buf, len, 999);  // Print to the UART
+  }
+  return len;
+}
 /* USER CODE END 0 */
 
 /**
@@ -113,6 +136,7 @@ void StartTask02(void *argument);
   */
 int main(void)
 {
+
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -166,9 +190,11 @@ HSEM notification */
   MX_GPIO_Init();
   MX_ETH_Init();
   MX_USART3_UART_Init();
-  MX_USART1_UART_Init();
+  MX_USART2_UART_Init();
+  MX_RNG_Init();
   /* USER CODE BEGIN 2 */
   ModbusMaster_Init();
+
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -206,6 +232,7 @@ HSEM notification */
   /* USER CODE END RTOS_EVENTS */
 
   /* Start scheduler */
+
   osKernelStart();
 
   /* We should never get here as control is now taken by the scheduler */
@@ -243,8 +270,9 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48|RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.HSI48State = RCC_HSI48_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLM = 1;
@@ -329,50 +357,77 @@ static void MX_ETH_Init(void)
 }
 
 /**
-  * @brief USART1 Initialization Function
+  * @brief RNG Initialization Function
   * @param None
   * @retval None
   */
-static void MX_USART1_UART_Init(void)
+static void MX_RNG_Init(void)
 {
 
-  /* USER CODE BEGIN USART1_Init 0 */
+  /* USER CODE BEGIN RNG_Init 0 */
 
-  /* USER CODE END USART1_Init 0 */
+  /* USER CODE END RNG_Init 0 */
 
-  /* USER CODE BEGIN USART1_Init 1 */
+  /* USER CODE BEGIN RNG_Init 1 */
 
-  /* USER CODE END USART1_Init 1 */
-  huart1.Instance = USART1;
-  huart1.Init.BaudRate = 115200;
-  huart1.Init.WordLength = UART_WORDLENGTH_8B;
-  huart1.Init.StopBits = UART_STOPBITS_1;
-  huart1.Init.Parity = UART_PARITY_NONE;
-  huart1.Init.Mode = UART_MODE_TX_RX;
-  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
-  huart1.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-  huart1.Init.ClockPrescaler = UART_PRESCALER_DIV1;
-  huart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
-  if (HAL_RS485Ex_Init(&huart1, UART_DE_POLARITY_HIGH, 0, 0) != HAL_OK)
+  /* USER CODE END RNG_Init 1 */
+  hrng.Instance = RNG;
+  hrng.Init.ClockErrorDetection = RNG_CED_ENABLE;
+  if (HAL_RNG_Init(&hrng) != HAL_OK)
   {
     Error_Handler();
   }
-  if (HAL_UARTEx_SetTxFifoThreshold(&huart1, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_UARTEx_SetRxFifoThreshold(&huart1, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_UARTEx_DisableFifoMode(&huart1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN USART1_Init 2 */
+  /* USER CODE BEGIN RNG_Init 2 */
 
-  /* USER CODE END USART1_Init 2 */
+  /* USER CODE END RNG_Init 2 */
+
+}
+
+/**
+  * @brief USART2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART2_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART2_Init 0 */
+
+  /* USER CODE END USART2_Init 0 */
+
+  /* USER CODE BEGIN USART2_Init 1 */
+
+  /* USER CODE END USART2_Init 1 */
+  huart2.Instance = USART2;
+  huart2.Init.BaudRate = 115200;
+  huart2.Init.WordLength = UART_WORDLENGTH_8B;
+  huart2.Init.StopBits = UART_STOPBITS_1;
+  huart2.Init.Parity = UART_PARITY_NONE;
+  huart2.Init.Mode = UART_MODE_TX_RX;
+  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart2.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart2.Init.ClockPrescaler = UART_PRESCALER_DIV1;
+  huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_RS485Ex_Init(&huart2, UART_DE_POLARITY_HIGH, 0, 0) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_UARTEx_SetTxFifoThreshold(&huart2, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_UARTEx_SetRxFifoThreshold(&huart2, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_UARTEx_DisableFifoMode(&huart2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART2_Init 2 */
+
+  /* USER CODE END USART2_Init 2 */
 
 }
 
@@ -486,7 +541,7 @@ void StartDefaultTask(void *argument)
   {
 	      printf("Task1\r\n");
 	      // Send Modbus query: Slave ID 1, Function Code 4, Address 0, Length 1
-	      ModbusMaster_ReadInputRegisters(1,0, 1);
+	      ModbusMaster_ReadInputRegisters(1,2058, 1);
 
 	      // Receive response buffer (7 bytes expected)
 	      uint8_t responseBuffer[7];
@@ -495,10 +550,10 @@ void StartDefaultTask(void *argument)
 	      // Check response status
 	      if (ModbusMaster_FrameComplete_Flag)
 	      {
-	        // Extract the 16-bit register value (big-endian)
-	        uint16_t registerValue = (responseBuffer[3] << 8) | responseBuffer[4];
-	        printf("Input Register Value: %u\r\n", registerValue);
-	        ModbusMaster_FrameComplete_Flag = 0; // Reset flag
+	    	  uint16_t registerValue = (responseBuffer[3] << 8) | responseBuffer[4];
+	    	  float scaledValue = registerValue * scaling_factor;
+	    	  printf("Input Register Raw: %u, Scaled: %.2f\r\n", registerValue, scaledValue);
+	    	  ModbusMaster_FrameComplete_Flag = 0;
 	      }
 	      else if (ModbusMaster_TimeoutFlag)
 	      {
@@ -529,7 +584,7 @@ void StartTask02(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	printf("Task2\r\n");
+
     osDelay(1000);
   }
   /* USER CODE END StartTask02 */

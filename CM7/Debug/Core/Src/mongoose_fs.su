@@ -1,0 +1,3 @@
+../Core/Src/mongoose_fs.c:26:12:scmp	16	static
+../Core/Src/mongoose_fs.c:30:13:mg_unlist	16	static
+../Core/Src/mongoose_fs.c:33:13:mg_unpack	32	static

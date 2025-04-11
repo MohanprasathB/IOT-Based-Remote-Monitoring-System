@@ -62,8 +62,8 @@ all: main-build
 main-build: H745_ETH_RMII_MODBUS_AWS_CM7.elf secondary-outputs
 
 # Tool invocations
-H745_ETH_RMII_MODBUS_AWS_CM7.elf H745_ETH_RMII_MODBUS_AWS_CM7.map: $(OBJS) $(USER_OBJS) E:\STM32Workspace\H745_ETH_RMII_MODBUS_AWS\CM7\STM32H745ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "H745_ETH_RMII_MODBUS_AWS_CM7.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"E:\STM32Workspace\H745_ETH_RMII_MODBUS_AWS\CM7\STM32H745ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="H745_ETH_RMII_MODBUS_AWS_CM7.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+H745_ETH_RMII_MODBUS_AWS_CM7.elf H745_ETH_RMII_MODBUS_AWS_CM7.map: $(OBJS) $(USER_OBJS) C:\Users\Admin\Music\New\ folder\IOT-Based-Remote-Monitoring-System-main\IOT-Based-Remote-Monitoring-System-main\CM7\STM32H745ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "H745_ETH_RMII_MODBUS_AWS_CM7.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"C:\Users\Admin\Music\New folder\IOT-Based-Remote-Monitoring-System-main\IOT-Based-Remote-Monitoring-System-main\CM7\STM32H745ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="H745_ETH_RMII_MODBUS_AWS_CM7.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -u _printf_float -u _scanf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

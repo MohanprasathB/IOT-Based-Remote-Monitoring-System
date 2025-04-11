@@ -1,5 +1,5 @@
-../Core/Src/Master_Modbus.c:17:6:ModbusMaster_Init	32	static
-../Core/Src/Master_Modbus.c:43:16:ModbusMaster_CalculateCRC	24	static
-../Core/Src/Master_Modbus.c:61:6:ModbusMaster_SendRequest	32	static
-../Core/Src/Master_Modbus.c:92:16:ModbusMaster_ReceiveResponse	24	static
-../Core/Src/Master_Modbus.c:122:6:ModbusMaster_ReadInputRegisters	24	static
+../Core/Src/Master_Modbus.c:18:6:ModbusMaster_Init	32	static
+../Core/Src/Master_Modbus.c:44:16:ModbusMaster_CalculateCRC	24	static
+../Core/Src/Master_Modbus.c:62:6:ModbusMaster_SendRequest	32	static
+../Core/Src/Master_Modbus.c:93:16:ModbusMaster_ReceiveResponse	24	static
+../Core/Src/Master_Modbus.c:123:6:ModbusMaster_ReadInputRegisters	24	static
