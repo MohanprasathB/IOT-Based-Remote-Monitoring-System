@@ -1,6 +1,6 @@
 Middlewares/Third_Party/FreeRTOS/cmsis_os2.o: \
- C:/Users/Admin/Music/New\ folder/IOT-Based-Remote-Monitoring-System-main/IOT-Based-Remote-Monitoring-System-main/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c \
- C:/Users/Admin/Music/New\ folder/IOT-Based-Remote-Monitoring-System-main/IOT-Based-Remote-Monitoring-System-main/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
+ E:/STM32\ workspace/IOT-Based-Remote-Monitoring-System-main\ (1)/IOT-Based-Remote-Monitoring-System-main/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c \
+ E:/STM32\ workspace/IOT-Based-Remote-Monitoring-System-main\ (1)/IOT-Based-Remote-Monitoring-System-main/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
  ../../Drivers/CMSIS/Include/cmsis_compiler.h \
  ../../Drivers/CMSIS/Include/cmsis_gcc.h \
  ../../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h \
@@ -17,8 +17,8 @@ Middlewares/Third_Party/FreeRTOS/cmsis_os2.o: \
  ../../Middlewares/Third_Party/FreeRTOS/Source/include/task.h \
  ../../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h \
  ../../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h \
- C:/Users/Admin/Music/New\ folder/IOT-Based-Remote-Monitoring-System-main/IOT-Based-Remote-Monitoring-System-main/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/freertos_mpool.h \
- C:/Users/Admin/Music/New\ folder/IOT-Based-Remote-Monitoring-System-main/IOT-Based-Remote-Monitoring-System-main/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/freertos_os2.h \
+ E:/STM32\ workspace/IOT-Based-Remote-Monitoring-System-main\ (1)/IOT-Based-Remote-Monitoring-System-main/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/freertos_mpool.h \
+ E:/STM32\ workspace/IOT-Based-Remote-Monitoring-System-main\ (1)/IOT-Based-Remote-Monitoring-System-main/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/freertos_os2.h \
  ../../Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h7xx.h \
  ../../Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h745xx.h \
  ../../Drivers/CMSIS/Include/core_cm7.h \
@@ -53,7 +53,7 @@ Middlewares/Third_Party/FreeRTOS/cmsis_os2.o: \
  ../../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h \
  ../../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h \
  ../../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h
-C:/Users/Admin/Music/New\ folder/IOT-Based-Remote-Monitoring-System-main/IOT-Based-Remote-Monitoring-System-main/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h:
+E:/STM32\ workspace/IOT-Based-Remote-Monitoring-System-main\ (1)/IOT-Based-Remote-Monitoring-System-main/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h:
 ../../Drivers/CMSIS/Include/cmsis_compiler.h:
 ../../Drivers/CMSIS/Include/cmsis_gcc.h:
 ../../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
@@ -70,8 +70,8 @@ C:/Users/Admin/Music/New\ folder/IOT-Based-Remote-Monitoring-System-main/IOT-Bas
 ../../Middlewares/Third_Party/FreeRTOS/Source/include/task.h:
 ../../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h:
 ../../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h:
-C:/Users/Admin/Music/New\ folder/IOT-Based-Remote-Monitoring-System-main/IOT-Based-Remote-Monitoring-System-main/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/freertos_mpool.h:
-C:/Users/Admin/Music/New\ folder/IOT-Based-Remote-Monitoring-System-main/IOT-Based-Remote-Monitoring-System-main/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/freertos_os2.h:
+E:/STM32\ workspace/IOT-Based-Remote-Monitoring-System-main\ (1)/IOT-Based-Remote-Monitoring-System-main/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/freertos_mpool.h:
+E:/STM32\ workspace/IOT-Based-Remote-Monitoring-System-main\ (1)/IOT-Based-Remote-Monitoring-System-main/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/freertos_os2.h:
 ../../Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h7xx.h:
 ../../Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h745xx.h:
 ../../Drivers/CMSIS/Include/core_cm7.h:

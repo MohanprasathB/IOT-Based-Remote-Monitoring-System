@@ -46,6 +46,7 @@
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 #define scaling_factor 0.01f
+volatile float scaledValue;
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -79,7 +80,7 @@ UART_HandleTypeDef huart3;
 osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
   .name = "defaultTask",
-  .stack_size = 128 * 4,
+  .stack_size = 1000 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for myTask02 */
@@ -193,7 +194,7 @@ HSEM notification */
   MX_USART2_UART_Init();
   MX_RNG_Init();
   /* USER CODE BEGIN 2 */
-  ModbusMaster_Init();
+
 
   /* USER CODE END 2 */
 
@@ -232,7 +233,6 @@ HSEM notification */
   /* USER CODE END RTOS_EVENTS */
 
   /* Start scheduler */
-
   osKernelStart();
 
   /* We should never get here as control is now taken by the scheduler */
@@ -537,6 +537,8 @@ void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN 5 */
   /* Infinite loop */
+	 mongoose_init();
+     mg_mgr_poll(&g_mgr, 50);
   for(;;)
   {
 	      printf("Task1\r\n");
@@ -551,7 +553,7 @@ void StartDefaultTask(void *argument)
 	      if (ModbusMaster_FrameComplete_Flag)
 	      {
 	    	  uint16_t registerValue = (responseBuffer[3] << 8) | responseBuffer[4];
-	    	  float scaledValue = registerValue * scaling_factor;
+	    	  scaledValue = registerValue * scaling_factor;
 	    	  printf("Input Register Raw: %u, Scaled: %.2f\r\n", registerValue, scaledValue);
 	    	  ModbusMaster_FrameComplete_Flag = 0;
 	      }
@@ -581,6 +583,7 @@ void StartDefaultTask(void *argument)
 void StartTask02(void *argument)
 {
   /* USER CODE BEGIN StartTask02 */
+
   /* Infinite loop */
   for(;;)
   {

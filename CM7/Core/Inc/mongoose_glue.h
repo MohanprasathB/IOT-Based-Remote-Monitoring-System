@@ -42,6 +42,7 @@ void glue_init(void);        // Called at the end of mongoose_init()
 #define run_mongoose() \
   do {                 \
     mongoose_init();   \
+    ModbusMaster_Init();\
     for (;;) {         \
       mongoose_poll(); \
     }                  \

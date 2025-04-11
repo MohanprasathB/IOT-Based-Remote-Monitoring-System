@@ -1,5 +1,5 @@
 Middlewares/Third_Party/FreeRTOS/stream_buffer.o: \
- C:/Users/Admin/Music/New\ folder/IOT-Based-Remote-Monitoring-System-main/IOT-Based-Remote-Monitoring-System-main/Middlewares/Third_Party/FreeRTOS/Source/stream_buffer.c \
+ E:/STM32\ workspace/IOT-Based-Remote-Monitoring-System-main\ (1)/IOT-Based-Remote-Monitoring-System-main/Middlewares/Third_Party/FreeRTOS/Source/stream_buffer.c \
  ../../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h \
  ../Core/Inc/FreeRTOSConfig.h \
  ../../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h \

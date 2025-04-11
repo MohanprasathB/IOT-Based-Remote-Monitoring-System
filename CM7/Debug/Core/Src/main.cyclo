@@ -1,7 +1,7 @@
-../Core/Src/main.c:112:6:mg_random	3
-../Core/Src/main.c:121:10:mg_millis	1
-../Core/Src/main.c:125:5:_write	3
-../Core/Src/main.c:137:5:main	1
+../Core/Src/main.c:113:6:mg_random	3
+../Core/Src/main.c:122:10:mg_millis	1
+../Core/Src/main.c:126:5:_write	3
+../Core/Src/main.c:138:5:main	1
 ../Core/Src/main.c:255:6:SystemClock_Config	4
 ../Core/Src/main.c:315:13:MX_ETH_Init	2
 ../Core/Src/main.c:364:13:MX_RNG_Init	2
@@ -9,6 +9,6 @@
 ../Core/Src/main.c:439:13:MX_USART3_UART_Init	5
 ../Core/Src/main.c:487:13:MX_GPIO_Init	1
 ../Core/Src/main.c:536:6:StartDefaultTask	3
-../Core/Src/main.c:581:6:StartTask02	1
-../Core/Src/main.c:601:6:HAL_TIM_PeriodElapsedCallback	2
-../Core/Src/main.c:618:6:Error_Handler	1
+../Core/Src/main.c:585:6:StartTask02	1
+../Core/Src/main.c:606:6:HAL_TIM_PeriodElapsedCallback	2
+../Core/Src/main.c:623:6:Error_Handler	1

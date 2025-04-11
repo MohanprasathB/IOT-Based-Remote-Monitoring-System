@@ -679,8 +679,6 @@ void mongoose_init(void) {
 #endif
 
   MG_INFO(("Mongoose init complete, calling user init"));
-  glue_init_1();
-  glue_init_2();
   glue_init_3();
 }
 
