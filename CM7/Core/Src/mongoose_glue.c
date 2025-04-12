@@ -6,7 +6,7 @@
 // #include "hal.h"
 
 #include "mongoose_glue.h"
-#include "Master_Modbus.h"
+
 
 //static void timer_fn(void *arg) {
 //  // Publish to MQTT topic
@@ -93,15 +93,16 @@
 //	    }
 //	  }
 //}
-extern volatile float scaledValue;
+// Add this line in mongoose_glue.h
+extern float scaledValue;
 static void timer_fn_1(void *arg) {
 	static int increment =0;
 	 if (g_mqtt_conn != NULL) {
 	    struct mg_mqtt_opts opts;
 	    char msg[16];
-	    snprintf(msg, sizeof(msg), "%d", increment);
+	   snprintf(msg, sizeof(msg), "%.2f", scaledValue);
 	    memset(&opts, 0, sizeof(opts));
-	    opts.topic = mg_str("nodered/d2/s1");
+	    opts.topic = mg_str("companysix/d1/topic1|mils");
 	    opts.message = mg_str(msg);
 	    mg_mqtt_pub(g_mqtt_conn, &opts);
 	    if(increment >101){
@@ -143,16 +144,15 @@ static void timer_fn_3(void *arg) {
 	 if (g_mqtt_conn != NULL) {
 	    struct mg_mqtt_opts opts;
 	    char msg[16];
-	    snprintf(msg, sizeof(msg), "%.2f", scaledValue);  // Format float as string
+	   snprintf(msg, sizeof(msg), "%d", random_value);
 	    memset(&opts, 0, sizeof(opts));
 	    opts.topic = mg_str("nodered/d2/s3");
 	    opts.message = mg_str(msg);
 	    mg_mqtt_pub(g_mqtt_conn, &opts);
 }
 }
-
 void glue_init_3(void) {
-	  mg_timer_add(&g_mgr, 1000, MG_TIMER_REPEAT, timer_fn_3, NULL);
+	  mg_timer_add(&g_mgr, 5000, MG_TIMER_REPEAT, timer_fn_3, NULL);
   MG_DEBUG(("Custom init done"));
 }
 
@@ -185,8 +185,9 @@ void glue_mqtt_tls_init(struct mg_connection *c) {
 void glue_mqtt_on_connect(struct mg_connection *c, int code) {
   struct mg_mqtt_opts opts;
   memset(&opts, 0, sizeof(opts));
+  opts.user=mg_str("Sarayu");
+  opts.pass=mg_str("IOTteam@123");
   opts.qos = 1;
-
   opts.topic = mg_str("device1/rx");
   mg_mqtt_sub(c, &opts);
   MG_DEBUG(("%lu code %d. Subscribing to [%.*s]", c->id, code, opts.topic.len,

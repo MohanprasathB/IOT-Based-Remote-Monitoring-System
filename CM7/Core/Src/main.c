@@ -6,7 +6,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2025 STMicroelectronics.
+  * Copyright (c) 2024 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -19,14 +19,12 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "string.h"
-#include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "stdio.h"
-#include "Master_Modbus.h"
+/* USER CODE BEGIN Includes */
 #include "mongoose_glue.h"
-#include "mongoose.h"
+#include "Master_Modbus.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -46,7 +44,6 @@
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 #define scaling_factor 0.01f
-volatile float scaledValue;
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -76,22 +73,8 @@ RNG_HandleTypeDef hrng;
 UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
 
-/* Definitions for defaultTask */
-osThreadId_t defaultTaskHandle;
-const osThreadAttr_t defaultTask_attributes = {
-  .name = "defaultTask",
-  .stack_size = 1000 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
-};
-/* Definitions for myTask02 */
-osThreadId_t myTask02Handle;
-const osThreadAttr_t myTask02_attributes = {
-  .name = "myTask02",
-  .stack_size = 2000 * 4,
-  .priority = (osPriority_t) osPriorityLow,
-};
 /* USER CODE BEGIN PV */
-
+float scaledValue = 0.0f;         // Stores Modbus data
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -99,17 +82,16 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_ETH_Init(void);
 static void MX_USART3_UART_Init(void);
-static void MX_USART2_UART_Init(void);
 static void MX_RNG_Init(void);
-void StartDefaultTask(void *argument);
-void StartTask02(void *argument);
-
+static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
-
+//static void run_mongoose(void);
+void modbus_handler(void *arg);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
 bool mg_random(void *buf, size_t len) {  // Use on-board RNG
   for (size_t n = 0; n < len; n += sizeof(uint32_t)) {
     uint32_t r;
@@ -129,6 +111,7 @@ int _write(int fd, unsigned char *buf, int len) {
   }
   return len;
 }
+
 /* USER CODE END 0 */
 
 /**
@@ -191,52 +174,11 @@ HSEM notification */
   MX_GPIO_Init();
   MX_ETH_Init();
   MX_USART3_UART_Init();
-  MX_USART2_UART_Init();
   MX_RNG_Init();
+  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-
-
-  /* USER CODE END 2 */
-
-  /* Init scheduler */
-  osKernelInitialize();
-
-  /* USER CODE BEGIN RTOS_MUTEX */
-  /* add mutexes, ... */
-  /* USER CODE END RTOS_MUTEX */
-
-  /* USER CODE BEGIN RTOS_SEMAPHORES */
-  /* add semaphores, ... */
-  /* USER CODE END RTOS_SEMAPHORES */
-
-  /* USER CODE BEGIN RTOS_TIMERS */
-  /* start timers, add new ones, ... */
-  /* USER CODE END RTOS_TIMERS */
-
-  /* USER CODE BEGIN RTOS_QUEUES */
-  /* add queues, ... */
-  /* USER CODE END RTOS_QUEUES */
-
-  /* Create the thread(s) */
-  /* creation of defaultTask */
-  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
-
-  /* creation of myTask02 */
-  myTask02Handle = osThreadNew(StartTask02, NULL, &myTask02_attributes);
-
-  /* USER CODE BEGIN RTOS_THREADS */
-  /* add threads, ... */
-  /* USER CODE END RTOS_THREADS */
-
-  /* USER CODE BEGIN RTOS_EVENTS */
-  /* add events, ... */
-  /* USER CODE END RTOS_EVENTS */
-
-  /* Start scheduler */
-  osKernelStart();
-
-  /* We should never get here as control is now taken by the scheduler */
-
+  mongoose_init();
+  mg_timer_add(&g_mgr, 1000, MG_TIMER_REPEAT, modbus_handler, NULL);
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
@@ -244,6 +186,8 @@ HSEM notification */
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  mongoose_poll();
+
   }
   /* USER CODE END 3 */
 }
@@ -486,7 +430,6 @@ static void MX_USART3_UART_Init(void)
   */
 static void MX_GPIO_Init(void)
 {
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
 /* USER CODE BEGIN MX_GPIO_Init_1 */
 /* USER CODE END MX_GPIO_Init_1 */
 
@@ -496,123 +439,46 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOG_CLK_ENABLE();
-  __HAL_RCC_GPIOE_CLK_ENABLE();
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0|GPIO_PIN_14, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1, GPIO_PIN_RESET);
-
-  /*Configure GPIO pins : PB0 PB14 */
-  GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_14;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : PE1 */
-  GPIO_InitStruct.Pin = GPIO_PIN_1;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
-
+//static void event(struct mg_connection *c, int ev, void *ev_data) {
+//    if (ev == MG_EV_HTTP_MSG) {
+//      struct mg_http_message *hm = ev_data;  // Parsed HTTP request
+//      mg_http_reply(c, 200, "", "Server Creation successfull", mg_millis());
+//    }
+//  }
+//static void run_mongoose(void) {
+//  struct mg_mgr mgr;        // Mongoose event manager
+//  mg_mgr_init(&mgr);        // Initialise event manager
+//  mg_http_listen(&mgr, "http://0.0.0.0:80", event, NULL);
+//  mg_log_set(MG_LL_DEBUG);  // Set log level to debug
+//  for (;;) {                // Infinite event loop
+//    mg_mgr_poll(&mgr, 0);   // Process network events
+//  }
+//  mg_mgr_free(&mgr);
+//}
+void modbus_handler(void *arg) {
+    (void)arg;  // Unused parameter
+    ModbusMaster_ReadInputRegisters(1, 2058, 1);
+    uint8_t responseBuffer[7];
+    unsigned short responseLength = ModbusMaster_ReceiveResponse(responseBuffer, sizeof(responseBuffer));
+    if (ModbusMaster_FrameComplete_Flag) {
+        uint16_t registerValue = (responseBuffer[3] << 8) | responseBuffer[4];
+        scaledValue = registerValue * scaling_factor;
+        printf("Input Register Raw: %u, Scaled: %.2f\r\n", registerValue, scaledValue);
+        ModbusMaster_FrameComplete_Flag = 0;
+    } else if (ModbusMaster_TimeoutFlag) {
+        printf("Modbus Timeout!\r\n");
+        ModbusMaster_TimeoutFlag = 0;
+    } else {
+        printf("Invalid Response (CRC Error)\r\n");
+    }
+}
 /* USER CODE END 4 */
-
-/* USER CODE BEGIN Header_StartDefaultTask */
-/**
-  * @brief  Function implementing the defaultTask thread.
-  * @param  argument: Not used
-  * @retval None
-  */
-/* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void *argument)
-{
-  /* USER CODE BEGIN 5 */
-  /* Infinite loop */
-	 mongoose_init();
-     mg_mgr_poll(&g_mgr, 50);
-  for(;;)
-  {
-	      printf("Task1\r\n");
-	      // Send Modbus query: Slave ID 1, Function Code 4, Address 0, Length 1
-	      ModbusMaster_ReadInputRegisters(1,2058, 1);
-
-	      // Receive response buffer (7 bytes expected)
-	      uint8_t responseBuffer[7];
-	      unsigned short responseLength = ModbusMaster_ReceiveResponse(responseBuffer, sizeof(responseBuffer));
-
-	      // Check response status
-	      if (ModbusMaster_FrameComplete_Flag)
-	      {
-	    	  uint16_t registerValue = (responseBuffer[3] << 8) | responseBuffer[4];
-	    	  scaledValue = registerValue * scaling_factor;
-	    	  printf("Input Register Raw: %u, Scaled: %.2f\r\n", registerValue, scaledValue);
-	    	  ModbusMaster_FrameComplete_Flag = 0;
-	      }
-	      else if (ModbusMaster_TimeoutFlag)
-	      {
-	        printf("Modbus Timeout!\r\n");
-	        ModbusMaster_TimeoutFlag = 0; // Reset flag
-	      }
-	      else
-	      {
-	        printf("Invalid Response (CRC Error)\r\n");
-	      }
-
-	      osDelay(1000); // Wait 1 second before next query
-	    }
-
-  /* USER CODE END 5 */
-}
-
-/* USER CODE BEGIN Header_StartTask02 */
-/**
-* @brief Function implementing the myTask02 thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_StartTask02 */
-void StartTask02(void *argument)
-{
-  /* USER CODE BEGIN StartTask02 */
-
-  /* Infinite loop */
-  for(;;)
-  {
-
-    osDelay(1000);
-  }
-  /* USER CODE END StartTask02 */
-}
-
-/**
-  * @brief  Period elapsed callback in non blocking mode
-  * @note   This function is called  when TIM6 interrupt took place, inside
-  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
-  * a global variable "uwTick" used as application time base.
-  * @param  htim : TIM handle
-  * @retval None
-  */
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-  /* USER CODE BEGIN Callback 0 */
-
-  /* USER CODE END Callback 0 */
-  if (htim->Instance == TIM6) {
-    HAL_IncTick();
-  }
-  /* USER CODE BEGIN Callback 1 */
-
-  /* USER CODE END Callback 1 */
-}
 
 /**
   * @brief  This function is executed in case of error occurrence.

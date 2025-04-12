@@ -10,14 +10,14 @@ extern "C" {
 #endif
 
 #include "mongoose.h"
-#include "Master_Modbus.h"
+#include "main.h"
 #define WIZARD_ENABLE_HTTP 1
 #define WIZARD_ENABLE_HTTPS 1
 #define WIZARD_ENABLE_HTTP_UI 1
 #define WIZARD_ENABLE_HTTP_UI_LOGIN 1
 
 #define WIZARD_ENABLE_MQTT 1
-#define WIZARD_MQTT_URL "mqtt://3.109.128.123:1883"
+#define WIZARD_MQTT_URL "3.109.128.123:1883"
 
 #define WIZARD_ENABLE_SNTP 1  // Enable time sync.
 #define WIZARD_SNTP_TYPE 0    // 0: default Google, 1: DHCP, 2: custom
@@ -42,7 +42,6 @@ void glue_init(void);        // Called at the end of mongoose_init()
 #define run_mongoose() \
   do {                 \
     mongoose_init();   \
-    ModbusMaster_Init();\
     for (;;) {         \
       mongoose_poll(); \
     }                  \
@@ -60,7 +59,7 @@ void glue_unlock(void);     // Unlock global Mongoose mutex
 
 // Increment device change state counter - trigger UI refresh
 void glue_update_state(void);
-
+extern float scaledValue;
 // Firmware Glue
 
 

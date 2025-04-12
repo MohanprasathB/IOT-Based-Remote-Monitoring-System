@@ -35,34 +35,34 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := H745_ETH_RMII_MODBUS_AWS_CM4
+BUILD_ARTIFACT_NAME := Mongoose_ETH_CM4
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-H745_ETH_RMII_MODBUS_AWS_CM4.elf \
+Mongoose_ETH_CM4.elf \
 
 MAP_FILES += \
-H745_ETH_RMII_MODBUS_AWS_CM4.map \
+Mongoose_ETH_CM4.map \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-H745_ETH_RMII_MODBUS_AWS_CM4.list \
+Mongoose_ETH_CM4.list \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: H745_ETH_RMII_MODBUS_AWS_CM4.elf secondary-outputs
+main-build: Mongoose_ETH_CM4.elf secondary-outputs
 
 # Tool invocations
-H745_ETH_RMII_MODBUS_AWS_CM4.elf H745_ETH_RMII_MODBUS_AWS_CM4.map: $(OBJS) $(USER_OBJS) E:\STM32\ workspace\IOT-Based-Remote-Monitoring-System-main\ (1)\IOT-Based-Remote-Monitoring-System-main\CM4\STM32H745ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "H745_ETH_RMII_MODBUS_AWS_CM4.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"E:\STM32 workspace\IOT-Based-Remote-Monitoring-System-main (1)\IOT-Based-Remote-Monitoring-System-main\CM4\STM32H745ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="H745_ETH_RMII_MODBUS_AWS_CM4.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Mongoose_ETH_CM4.elf Mongoose_ETH_CM4.map: $(OBJS) $(USER_OBJS) D:\STM_CUBE_PROJECT\Mongoose_ETH\CM4\STM32H745ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "Mongoose_ETH_CM4.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"D:\STM_CUBE_PROJECT\Mongoose_ETH\CM4\STM32H745ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Mongoose_ETH_CM4.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -71,14 +71,14 @@ default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-H745_ETH_RMII_MODBUS_AWS_CM4.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "H745_ETH_RMII_MODBUS_AWS_CM4.list"
+Mongoose_ETH_CM4.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "Mongoose_ETH_CM4.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) H745_ETH_RMII_MODBUS_AWS_CM4.elf H745_ETH_RMII_MODBUS_AWS_CM4.list H745_ETH_RMII_MODBUS_AWS_CM4.map default.size.stdout
+	-$(RM) Mongoose_ETH_CM4.elf Mongoose_ETH_CM4.list Mongoose_ETH_CM4.map default.size.stdout
 	-@echo ' '
 
 secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
