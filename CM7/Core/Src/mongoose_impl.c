@@ -4,7 +4,7 @@
 
 #include "mongoose.h"
 #include "mongoose_glue.h"
-
+#include "main.h"
 #if MG_ARCH == MG_ARCH_UNIX || MG_ARCH == MG_ARCH_WIN32
 #define HTTP_URL "http://127.0.0.1:1880/"
 #define HTTPS_URL "https://0.0.0.0:8443"
@@ -680,8 +680,7 @@ void mongoose_init(void) {
 
   MG_INFO(("Mongoose init complete, calling user init"));
   glue_init_1();
-  glue_init_2();
-  glue_init_3();
+
 }
 
 void mongoose_poll(void) {

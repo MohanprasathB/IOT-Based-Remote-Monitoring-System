@@ -94,25 +94,20 @@
 //	  }
 //}
 // Add this line in mongoose_glue.h
-extern float scaledValue;
+// Add extern declaration
+extern volatile uint16_t uart_hex_value;
 static void timer_fn_1(void *arg) {
-	static int increment =0;
-	 if (g_mqtt_conn != NULL) {
-	    struct mg_mqtt_opts opts;
-	    char msg[16];
-	   snprintf(msg, sizeof(msg), "%.2f", scaledValue);
-	    memset(&opts, 0, sizeof(opts));
-	    opts.topic = mg_str("companysix/d1/topic1|mils");
-	    opts.message = mg_str(msg);
-	    mg_mqtt_pub(g_mqtt_conn, &opts);
-	    if(increment >101){
-	    	increment =0;
-	    }
-	    else{
-	    	increment++;
-	    }
+  if (g_mqtt_conn != NULL) {
+    struct mg_mqtt_opts opts;
+    char msg[16];
+    snprintf(msg, sizeof(msg), "%.3f", uart_hex_value*0.001); // Send as decimal
+    memset(&opts, 0, sizeof(opts));
+    opts.topic = mg_str("companysix/d1/topic1|mils");
+    opts.message = mg_str(msg);
+    mg_mqtt_pub(g_mqtt_conn, &opts);
+  }
 }
-}
+
 void glue_init_1(void) {
 	  mg_timer_add(&g_mgr, 1000, MG_TIMER_REPEAT, timer_fn_1, NULL);
   MG_DEBUG(("Custom init done"));

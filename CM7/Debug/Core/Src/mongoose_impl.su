@@ -22,4 +22,4 @@
 ../Core/Src/mongoose_impl.c:563:13:handle_modbus_pdu	336	static
 ../Core/Src/mongoose_impl.c:630:13:modbus_ev_handler	32	static
 ../Core/Src/mongoose_impl.c:645:6:mongoose_init	128	static
-../Core/Src/mongoose_impl.c:687:6:mongoose_poll	8	static
+../Core/Src/mongoose_impl.c:686:6:mongoose_poll	8	static

@@ -24,7 +24,6 @@
 /* USER CODE BEGIN Includes */
 /* USER CODE BEGIN Includes */
 #include "mongoose_glue.h"
-#include "Master_Modbus.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -65,16 +64,16 @@ ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT] __attribute__((section(".TxDecr
 #endif
 
 ETH_TxPacketConfig TxConfig;
-
 ETH_HandleTypeDef heth;
-
 RNG_HandleTypeDef hrng;
-
 UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
-float scaledValue = 0.0f;         // Stores Modbus data
+float scaledValue = 0.0f;
+volatile uint16_t uart_hex_value = 0;  // Stores parsed HEX value
+volatile bool uart_data_ready = false; // Flag for new data
+uint8_t uart_rx_buffer[128];           // UART receive buffer
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -110,6 +109,34 @@ int _write(int fd, unsigned char *buf, int len) {
     HAL_UART_Transmit(&huart3, buf, len, 999);  // Print to the UART
   }
   return len;
+}
+
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+  if (huart == &huart2) {
+    size_t received_len = huart->RxXferSize - huart->RxXferCount;
+    if (received_len >= sizeof(uart_rx_buffer)) {
+      received_len = sizeof(uart_rx_buffer) - 1;
+    }
+    uart_rx_buffer[received_len] = '\0';
+    char *ptr = strstr((char*)uart_rx_buffer, "udpr");
+    if (ptr != NULL) {
+      char *hex_start = strrchr(ptr, ' ');
+      if (hex_start != NULL) {
+        hex_start++;
+        char *endptr;
+        errno = 0;
+        unsigned long value = strtoul(hex_start, &endptr, 16);
+        if (endptr != hex_start && errno == 0 && value <= UINT16_MAX) {
+          uart_hex_value = (uint16_t)value;
+          uart_data_ready = true;
+        } else {
+          uart_hex_value = 1;
+        }
+      }
+    }
+    HAL_UART_Receive_IT(&huart2, uart_rx_buffer, sizeof(uart_rx_buffer));
+  }
 }
 
 /* USER CODE END 0 */
@@ -177,8 +204,10 @@ HSEM notification */
   MX_RNG_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
+  HAL_UART_Receive_IT(&huart2, uart_rx_buffer, sizeof(uart_rx_buffer));
   mongoose_init();
-  mg_timer_add(&g_mgr, 1000, MG_TIMER_REPEAT, modbus_handler, NULL);
+  /* USER CODE END 2 */
+
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
@@ -192,10 +221,7 @@ HSEM notification */
   /* USER CODE END 3 */
 }
 
-/**
-  * @brief System Clock Configuration
-  * @retval None
-  */
+
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
@@ -353,7 +379,7 @@ static void MX_USART2_UART_Init(void)
   huart2.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
   huart2.Init.ClockPrescaler = UART_PRESCALER_DIV1;
   huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
-  if (HAL_RS485Ex_Init(&huart2, UART_DE_POLARITY_HIGH, 0, 0) != HAL_OK)
+  if (HAL_UART_Init(&huart2) != HAL_OK)
   {
     Error_Handler();
   }
@@ -445,39 +471,7 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-//static void event(struct mg_connection *c, int ev, void *ev_data) {
-//    if (ev == MG_EV_HTTP_MSG) {
-//      struct mg_http_message *hm = ev_data;  // Parsed HTTP request
-//      mg_http_reply(c, 200, "", "Server Creation successfull", mg_millis());
-//    }
-//  }
-//static void run_mongoose(void) {
-//  struct mg_mgr mgr;        // Mongoose event manager
-//  mg_mgr_init(&mgr);        // Initialise event manager
-//  mg_http_listen(&mgr, "http://0.0.0.0:80", event, NULL);
-//  mg_log_set(MG_LL_DEBUG);  // Set log level to debug
-//  for (;;) {                // Infinite event loop
-//    mg_mgr_poll(&mgr, 0);   // Process network events
-//  }
-//  mg_mgr_free(&mgr);
-//}
-void modbus_handler(void *arg) {
-    (void)arg;  // Unused parameter
-    ModbusMaster_ReadInputRegisters(1, 2058, 1);
-    uint8_t responseBuffer[7];
-    unsigned short responseLength = ModbusMaster_ReceiveResponse(responseBuffer, sizeof(responseBuffer));
-    if (ModbusMaster_FrameComplete_Flag) {
-        uint16_t registerValue = (responseBuffer[3] << 8) | responseBuffer[4];
-        scaledValue = registerValue * scaling_factor;
-        printf("Input Register Raw: %u, Scaled: %.2f\r\n", registerValue, scaledValue);
-        ModbusMaster_FrameComplete_Flag = 0;
-    } else if (ModbusMaster_TimeoutFlag) {
-        printf("Modbus Timeout!\r\n");
-        ModbusMaster_TimeoutFlag = 0;
-    } else {
-        printf("Invalid Response (CRC Error)\r\n");
-    }
-}
+
 /* USER CODE END 4 */
 
 /**
